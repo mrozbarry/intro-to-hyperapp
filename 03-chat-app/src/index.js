@@ -57,19 +57,21 @@ const actions = {
   }),
 
   sendMessage: text => state => {
+    const message = {
+      userId: state.user.uid,
+      text: text,
+      createdAt: firebase.database.ServerValue.TIMESTAMP,
+    }
+
     firebase.database()
       .ref("messages")
-      .push({
-        userId: state.user.uid,
-        text: text,
-        createdAt: firebase.database.ServerValue.TIMESTAMP,
-      })
+      .push(message)
 
     return {
       user: state.user,
       name: state.name,
       users: state.users,
-      messages: state.messages.concat({ userId: state.user.uid, text: text, createdAt: Date.now() }),
+      messages: state.messages.concat(Object.assign({}, message, { createdAt: Date.now() })),
       message: '',
     }
 
