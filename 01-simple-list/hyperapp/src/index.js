@@ -6,12 +6,17 @@ const state = {
 }
 
 const actions = {
-  addItem: (item) => state => ({ text: '', items: state.items.concat(item) }),
+  addItem: item => state => ({ text: '', items: state.items.concat(item) }),
   setText: value => state => ({ items: state.items, text: value })
 }
 
+const Thing = (props) => {
+  return (
+    <div onclick={props.onclick}>Hey, this is a thing</div>
+  );
+};
+
 const view = (state, actions) => {
-  console.log(state, actions)
   return (
     <div>
       <ul>
@@ -30,6 +35,7 @@ const view = (state, actions) => {
           />
         </li>
       </ul>
+      <Thing onclick={() => alert('hey')} />
     </div>
   )
 }

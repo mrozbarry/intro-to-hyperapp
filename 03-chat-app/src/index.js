@@ -16,7 +16,7 @@ const state = {
 }
 
 const actions = {
-  login: name => (state, actions) => {
+  login: name => (state) => {
     if (!name) return state
 
     firebase.auth().signInAnonymously()
@@ -29,8 +29,8 @@ const actions = {
   },
 
   logout: () => (state, action) => {
-    firebase.auth().signout()
-  }
+    firebase.auth().signOut()
+  },
 
   setAuth: user => state => ({
     user: user,
@@ -45,7 +45,7 @@ const actions = {
     name: state.name,
     users: state.users,
     messages: state.messages.concat(message),
-    message: '',
+    message: state.message,
   }),
 
   setUsers: users => state => ({
@@ -64,41 +64,82 @@ const actions = {
         text: text,
         createdAt: firebase.database.ServerValue.TIMESTAMP,
       })
+
+    return {
+      user: state.user,
+      name: state.name,
+      users: state.users,
+      messages: state.messages.concat({ userId: state.user.uid, text: text, createdAt: Date.now() }),
+      message: '',
+    }
+
   },
 
-  messageChanged: message => state => (
+  messageChanged: message => state => ({
     user: state.user,
     name: state.name,
     users: state.users,
     messages: state.messages,
     message: message,
+  }),
+
+  nameChanged: name => state => ({
+    user: state.user,
+    name: name,
+    users: state.users,
+    messages: state.messages,
+    message: state.message,
   })
 }
 
-/*
- * TODO: 
- *  - Need to be able to login
- *
- */
 const view = (state, actions) => (
   <div>
-    <div>{state.messages.map((message) => (<div>{JSON.stringify(message)}</div>))}</div>
+    <input
+      placeholder="Username"
+      value={state.name}
+      disabled={Boolean(state.user)}
+      oninput={(e) => actions.nameChanged(e.target.value)}
+      onkeydown={(e) => {
+        if (e.which === 13) {
+          console.log('do that login')
+          e.preventDefault()
+          actions.login(state.name)
+        }
+      }}
+    />
+    <button onclick={() => actions.logout()} disabled={!Boolean(state.user)}>
+      Logout
+    </button>
+    <input
+      value={state.message}
+      disabled={!Boolean(state.user)}
+      oninput={(e) => actions.messageChanged(e.target.value)}
+      onkeydown={(e) => {
+        if (e.which === 13) {
+          e.preventDefault()
+          actions.sendMessage(state.message)
+        }
+      }}
+      placeholder="Add your message"
+    />
+    <div>{state.messages.map((message, idx) => (<div key={idx}>{JSON.stringify(message)}</div>))}</div>
   </div>
 )
 
 const chat = app(state, actions, view, document.getElementById('root'))
 
-firebase.auth().onAuthStateChanged((user) => {
-  chat.setAuth(user)
-})
+firebase.auth()
+  .onAuthStateChanged((user) => {
+    chat.setAuth(user)
+  })
 
 firebase.database()
   .ref('messages')
   .on('child_added', (snapshot) => {
-    console.log('new message', snapshot.val())
-    chat.addMessage(snapshot.val())
+    const v = snapshot.val()
+    console.log('new message', v)
+    chat.addMessage(v)
   })
-
 
 firebase.database()
   .ref("users")
@@ -111,3 +152,7 @@ firebase.database()
         .map((id) => ({ id: id, name: users[id] }))
     )
   })
+
+setTimeout(() => {
+  chat.addMessage({ userId: -1, text: "----------------", createdAt: 0 })
+}, 1000)
