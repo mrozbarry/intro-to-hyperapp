@@ -44,7 +44,7 @@ const actions = {
     user: state.user,
     name: state.name,
     users: state.users,
-    messages: state.messages.concat(message),
+    messages: state.messages.concat(message).sort((a, b) => Math.sign(a.createdAt - b.createdAt)),
     message: state.message,
   }),
 
@@ -56,7 +56,7 @@ const actions = {
     message: state.message,
   }),
 
-  sendMessage: text => state => {
+  sendMessage: text => (state, actions) => {
     const message = {
       userId: state.user.uid,
       text: text,
@@ -66,12 +66,17 @@ const actions = {
     firebase.database()
       .ref("messages")
       .push(message)
+      .then(() => {
+        actions.addMessage(
+          Object.assign({}, message, { createdAt: Date.now() })
+        );
+      })
 
     return {
       user: state.user,
       name: state.name,
       users: state.users,
-      messages: state.messages.concat(Object.assign({}, message, { createdAt: Date.now() })),
+      messages: state.messages.concat(),
       message: '',
     }
 
@@ -124,37 +129,39 @@ const view = (state, actions) => (
       }}
       placeholder="Add your message"
     />
-    <div>{state.messages.map((message, idx) => (<div key={idx}>{JSON.stringify(message)}</div>))}</div>
+    <div>{state.messages.map((message, idx) => {
+      return (
+        <div key={message.id}>
+          <div>[{(new Date(message.createdAt)).toISOString()}] {message.userId}:</div>
+          {message.text}
+        </div>
+      );
+    })}</div>
   </div>
-)
+);
 
-const chat = app(state, actions, view, document.getElementById('root'))
+const chat = app(state, actions, view, document.getElementById('root'));
 
 firebase.auth()
   .onAuthStateChanged((user) => {
     chat.setAuth(user)
-  })
+  });
 
 firebase.database()
   .ref('messages')
   .on('child_added', (snapshot) => {
-    const v = snapshot.val()
-    console.log('new message', v)
-    chat.addMessage(v)
-  })
+    const v = snapshot.val();
+    chat.addMessage(v);
+  });
 
 firebase.database()
   .ref("users")
   .on("value", (snapshot) => {
-    const users = snapshot.val()
-    if (!users) return chat.setUsers([])
+    const users = snapshot.val();
+    if (!users) return chat.setUsers([]);
 
     chat.setUsers(
       Object.keys(users)
         .map((id) => ({ id: id, name: users[id] }))
-    )
-  })
-
-setTimeout(() => {
-  chat.addMessage({ userId: -1, text: "----------------", createdAt: 0 })
-}, 1000)
+    );
+  });
