@@ -54,8 +54,8 @@ const actions = {
       .concat(state.currentPlayer)
       .concat(state.board.slice(index + 1))
 
-    const isBoardFull = nextBoard.every((c) => c !== '')
-    const isWinner = completesLine(nextBoard, state.currentPlayer)
+    const isBoardFull = board.every((c) => c !== '')
+    const isWinner = completesLine(board, state.currentPlayer)
     const isDone = isWinner || isBoardFull
 
     return {

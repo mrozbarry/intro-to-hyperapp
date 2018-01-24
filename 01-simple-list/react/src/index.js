@@ -26,20 +26,18 @@ class List extends Component {
     const { items, text } = this.state
 
     return (
-      <div>
-        <ul>
-          {items.map((item, idx) => <li key={idx}>{item}</li>)}
-          <li key="text">
-            <input
-              type="text"
-              placeholder="Add a new item to the list"
-              value={text}
-              onChange={(e) => this.setState({ text: e.target.value }) }
-              onKeyDown={this.handleKeyDown.bind(this)}
-            />
-          </li>
-        </ul>
-      </div>
+      <ul>
+        {items.map((item, idx) => <li key={idx}>{item}</li>)}
+        <li key="text">
+          <input
+            type="text"
+            placeholder="Add a new item to the list"
+            value={text}
+            onChange={(e) => this.setState({ text: e.target.value }) }
+            onKeyDown={this.handleKeyDown.bind(this)}
+          />
+        </li>
+      </ul>
     )
   }
 }
