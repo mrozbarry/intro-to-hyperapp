@@ -13,9 +13,14 @@
     "firebase": "^4.9.0",
     "firebase-tools": "^3.17.3",
     "hyperapp": "^1.0.2",
+    "identicon.js": "^2.3.1",
     "randomcolor": "^0.5.3",
     "webpack": "3",
     "webpack-dev-server": "^2.9.4"
+  },
+  "devDependencies": {
+    "css-loader": "^0.28.9",
+    "style-loader": "^0.19.1"
   },
   "scripts": {
     "start": "webpack-dev-server --config ./webpack.config.js",
