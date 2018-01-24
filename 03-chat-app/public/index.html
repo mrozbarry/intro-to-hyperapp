@@ -1,5 +1,77 @@
 <!doctype html>
-<body>
-  <div id="root"></div>
-  <script src="bundle.js"></script>
-</body>
+<html lang="en">
+  <head>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <style type="text/css">
+      html, body {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        min-height: 100%;
+      }
+
+      .layout {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: space-between;
+        height: 100%;
+        width: 600px;
+        font-family: 'Open Sans', sans-serif;
+      }
+
+      .auth-bar {
+        display: flex;
+        flex-shrink: 1;
+        align-self: flex-start;
+        width: 100%;
+      }
+
+      .auth-bar-name {
+        flex-grow: 1;
+      }
+
+      .auth-bar-button {
+        flex-shrink: 1;
+      }
+
+      .messages {
+        flex-grow: 1;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        background-color: #3a3a3a;
+        padding: 0 16px;
+        overflow-y: auto;
+      }
+
+      .message {
+        max-width: 75%;
+        margin-bottom: 10px;
+        padding: 8px;
+      }
+
+      .message-author {
+        font-size: 14px;
+      }
+
+      .message-body {
+        font-size: 16px;
+      }
+
+      .message-date {
+        font-size: 10px;
+      }
+
+      .my-message {
+        flex: 0 1 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="bundle.js"></script>
+  </body>
+</html>
